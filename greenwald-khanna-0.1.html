@@ -27,12 +27,12 @@ text {
 <script src="//d3js.org/d3.v4.min.js"></script>
 <script src="require.js"></script>
 <script src="random.js"></script>
+<script src="streamingPercentiles.v1.min.js"></script>
 <script>
-requirejs(["streamingPercentiles.v1.min"], function (sp) {
     var dimensions = { width: 600, height: 400 };
     var margins = { top: 15, right: 10, bottom: 20, left: 30 };
 
-    function update_chart(gk, xdomain) {
+    function update_chart(gk, n, xdomain) {
         var data = [];
         for (var phi = 0.01; phi < 1; phi += 0.01) {
             data.push({phi: phi, v: gk.quantile(phi)});
@@ -80,7 +80,7 @@ requirejs(["streamingPercentiles.v1.min"], function (sp) {
         svg
             .select("g.info")
             .select("text.n")
-            .text("n = " + gk.n.toLocaleString() + " s = " + gk.S.length.toLocaleString());
+            .text("n = " + n.toLocaleString());
     }
 
     function create_chart() {
@@ -131,27 +131,25 @@ requirejs(["streamingPercentiles.v1.min"], function (sp) {
     }
 
     var rand = new Random(12345);
-    var series = rand.normalSeries(1000000);
+    var series = rand.normalSeries(1000);
     var xdomain = [-4, 4]; // If changing above, change this
     //var series = rand.uniformSeries(1000);
     //var xdomain = [0, 1];
     //var series = [11, 20, 18, 5, 12, 6, 3, 2, 1, 8, 14, 19, 15, 4, 10, 7, 9, 17, 16, 13, 0];
 
     create_chart();
-    var gk = new sp.GK(0.01);
+    var gk = new Module.GK(0.1);
     var i = 0;
     var o = setInterval(function() {
         do {
             gk.insert(series[i]);
             ++i;
-        } while (i % 10000 != 0);
-        update_chart(gk, xdomain);
+        } while (false);
+        update_chart(gk, i, xdomain);
         if (i >= series.length) {
-            //console.log(JSON.stringify(gk.S));
             clearInterval(o);
         }
     }, 0);
-});
 </script>
 </body>
 </html>

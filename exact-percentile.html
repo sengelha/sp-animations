@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Exact Percentile</title>
+<style>
+
+text {
+    font-family: sans-serif;
+    font-size: 10px;
+}
+
+.data line {
+    stroke: black;
+    shape-rendering: crispEdges;
+}
+
+.xaxis line, .yaxis line, line.pctile, line.ideal {
+    stroke: lightgrey;
+    stroke-opacity: 0.7;
+    shape-rendering: crispEdges;
+}
+
+</style>
+</head>
+<body>
+<script src="//d3js.org/d3.v4.min.js"></script>
+<script src="random.js"></script>
+<div id="chart"></div>
+<script>
+(function() {
+    var dimensions = { width: 600, height: 400 };
+    var margins = { top: 15, right: 10, bottom: 20, left: 30 };
+
+    function update_chart(data, xdomain) {
+        data.sort(function(a, b) { return a - b; });
+
+        var xscale = d3.scaleLinear()
+            .domain(xdomain)
+            .range([0, dimensions.width - margins.left - margins.right]);
+        var yscale = d3.scaleLinear()
+            .domain([0, data.length])
+            .range([dimensions.height - margins.top  - margins.bottom, 0]);
+
+        var svg = d3.select("#chart")
+          .select("svg");
+        var gdata = svg
+          .select("g.data");
+        var elems = gdata.selectAll("line")
+            .data(data);
+        elems.exit().remove();
+        elems.enter().append("line")
+            .attr("x1", function(d, i) { return xscale(d); })
+            .attr("y1", function(d, i) { return yscale(i); })
+            .attr("x2", function(d, i) { return xscale(d); })
+            .attr("y2", function(d, i) { return yscale(i+1); });
+        elems
+            .attr("x1", function(d, i) { return xscale(d); })
+            .attr("y1", function(d, i) { return yscale(i); })
+            .attr("x2", function(d, i) { return xscale(d); })
+            .attr("y2", function(d, i) { return yscale(i+1); });
+
+        /*
+        var ideal = svg
+            .select("g.ideal")
+            .select("line")
+            .attr("class", "ideal")
+            .attr("x1", xscale(extent[0]))
+            .attr("y1", yscale(0))
+            .attr("x2", xscale(extent[1]))
+            .attr("y2", yscale(data.length));
+        */
+
+        var xaxis = d3.axisBottom(xscale)
+            .tickSize(-(dimensions.height - margins.top - margins.bottom));
+        svg
+            .select("g.xaxis")
+            .call(xaxis);
+        
+        svg
+            .select("g.info")
+            .select("text.n")
+            .text("n = " + data.length.toLocaleString());
+    }
+    
+    function create_chart() {
+        var svg = d3.select("#chart")
+            .append("svg")
+            .attr("width", dimensions.width)
+            .attr("height", dimensions.height);
+        var g = svg.append("g")
+            .attr("class", "markers");
+        function draw_pctile_line(pctile, lbl) {
+            var y = dimensions.height - margins.bottom - pctile * (dimensions.height - margins.top - margins.bottom);
+            g.append("text")
+                .attr("x", margins.left - 3)
+                .attr("y", y + 2)
+                .attr("text-anchor", "end")
+                .text(lbl);
+            g.append("line")
+                .attr("class", "pctile")
+                .attr("y1", y)
+                .attr("x1", margins.left)
+                .attr("y2", y)
+                .attr("x2", dimensions.width - margins.right);
+        }
+        draw_pctile_line(0.05, "p5");
+        draw_pctile_line(0.25, "p25");
+        draw_pctile_line(0.5, "p50");
+        draw_pctile_line(0.75, "p75");
+        draw_pctile_line(0.95, "p95");
+
+        var gdata = svg.append("g")
+            .attr("class", "data")
+            .attr("transform", "translate(" + margins.left + ", " + margins.top + ")");
+        /*var gideal = svg.append("g")
+            .attr("class", "ideal")
+            .attr("transform", "translate(" + margins.left + ", " + margins.top + ")");
+        gideal.append("line");*/
+        svg.append("g")
+            .attr("class", "xaxis")
+            .attr("transform", "translate(" + margins.left + ", " + (dimensions.height - margins.bottom) + ")");
+        svg.append("g")
+            .attr("class", "yaxis")
+            .attr("transform", "translate(" + margins.left + ", " + margins.top + ")");
+        var ginfo = svg.append("g")
+            .attr("class", "info")
+            .attr("transform", "translate(" + margins.left + ", 0)");
+        ginfo.append("text")
+            .attr("class", "n")
+            .attr("x", 0.5 * (dimensions.width - margins.left - margins.right))
+            .attr("y", 10)
+            .attr("fill", "black")
+            .attr("text-anchor", "middle");
+    }
+
+    var rand = new Random(12345);
+    //var series = rand.uniformSeries(2000);
+    var series = rand.normalSeries(1000);
+    var xdomain = [-4, 4]; // If changing above, change this
+
+    create_chart();
+    var i = 1;
+    var o = setInterval(function() {
+        update_chart(series.slice(0, i), xdomain);
+        ++i;
+        if (i > series.length) {
+            clearInterval(o);
+        }
+    }, 0);
+})();
+</script>
+</body>
+</html>

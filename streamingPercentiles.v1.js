@@ -7327,6 +7327,13 @@ function dynCall_viid(index, a1, a2, a3) {
  FUNCTION_TABLE_viid[index & 7](a1 | 0, a2 | 0, +a3);
 }
 
+function __ZNK6stmpct8ckms_hbq4impl1fEdi($0, $1, $2) {
+ $0 = $0 | 0;
+ $1 = +$1;
+ $2 = $2 | 0;
+ return +((+($2 | 0) - $1) * (+HEAPF64[$0 + 24 >> 3] * 2.0));
+}
+
 function establishStackSpace(stackBase, stackMax) {
  stackBase = stackBase | 0;
  stackMax = stackMax | 0;
@@ -7401,13 +7408,6 @@ function __ZN10__cxxabiv121__vmi_class_type_infoD0Ev($0) {
 }
 
 function __ZNK6stmpct8ckms_lbq4impl1fEdi($0, $1, $2) {
- $0 = $0 | 0;
- $1 = +$1;
- $2 = $2 | 0;
- return +(+HEAPF64[$0 + 24 >> 3] * 2.0 * $1);
-}
-
-function __ZNK6stmpct8ckms_hbq4impl1fEdi($0, $1, $2) {
  $0 = $0 | 0;
  $1 = +$1;
  $2 = $2 | 0;
